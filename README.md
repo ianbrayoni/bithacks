@@ -79,7 +79,7 @@
     - [Determine if a word has a byte greater than n](#determine-if-a-word-has-a-byte-greater-than-n)
     - [Determine if a word has a byte between m and n](#determine-if-a-word-has-a-byte-between-m-and-n)
     - [Compute the lexicographically next bit permutation](#compute-the-lexicographically-next-bit-permutation)
-- [Contributions](#contributions)
+- [Contributing](#contributing)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -89,7 +89,7 @@ This project provides code snippets of Sean Anderson's compilation of [bit manip
 # Acknowledgement
 > Hats off to Sean Eron Anderson, seander@cs.stanford.edu, for creating https://graphics.stanford.edu/~seander/bithacks.html
 
-I **DO NOT** own any of this. The following contents comes directly from the above link. I would be happy to transfer the ownership of this repository to the original author, Sean Eron Anderson.
+I **DO NOT** own any of this. The following contents comes directly from the above link. I will be happy to transfer the ownership of this repository to the original author, Sean Eron Anderson.
 
 # License
 [License Information](LICENSE.md)
@@ -172,7 +172,7 @@ I **DO NOT** own any of this. The following contents comes directly from the abo
 ### Compute the lexicographically next bit permutation
 
 # Contributing
-Please take a minute to go over [Contributions Guidelines](CONTRIBUTING.md)
+Please take a minute to go over the [Contribution Guidelines](CONTRIBUTING.md).
 
 Contributions are welcome!
 * [Issue reports](https://github.com/ianbrayoni/bithacks/issues)
