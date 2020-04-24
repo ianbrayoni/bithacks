@@ -1,8 +1,5 @@
 # Bit Twiddling Hacks
-This project provides code snippets of Sean Anderson's compilation of [bit manipulation tricks](https://graphics.stanford.edu/~seander/bithacks.html) in [Python](https://www.python.org/) to make it easy to follow for those who do not have experience in [C](https://en.wikipedia.org/wiki/C_(programming_language)). I will not alter the explanations provided by Sean because they provide a lot of context. Where necessary, I will add a *NOTE* section as a quote, see below notation, or just as comments within the Python code.
-
-> *example quote*
-
+> This project provides code snippets of Sean Anderson's compilation of [bit manipulation tricks](https://graphics.stanford.edu/~seander/bithacks.html) in [Python](https://www.python.org/) to make it easy to follow for those who do not have experience in [C](https://en.wikipedia.org/wiki/C_(programming_language)).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -92,6 +89,10 @@ This project provides code snippets of Sean Anderson's compilation of [bit manip
 > Hats off to Sean Eron Anderson, seander@cs.stanford.edu, for creating https://graphics.stanford.edu/~seander/bithacks.html
 
 I **DO NOT** own any of this. The following contents comes directly from the above link. I will be happy to transfer the ownership of this repository to the original author, Sean Eron Anderson.
+
+ I will not alter the explanations provided by Sean because they provide a lot of context. Where necessary, I will add a *NOTE* section as a quote, see below notation, or just as comments within the Python code.
+
+> *example quote*
 
 # License
 [License Information](LICENSE.md)
