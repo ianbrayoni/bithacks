@@ -104,39 +104,62 @@ I **DO NOT** own any of this. The following contents comes directly from the abo
 When totaling the number of operations for algorithms here, any Python operator is counted as one operation. Intermediate assignments, which need not be written to RAM, are not counted. Of course, this operation counting approach only serves as an approximation of the actual number of machine instructions and CPU time. All operations are assumed to take the same amount of time, which is not true in reality, but CPUs have been heading increasingly in this direction over time. There are many nuances that determine how fast a system will run a given sample of code, such as cache sizes, memory bandwidths, instruction sets, etc. In the end, benchmarking is the best way to determine whether one method is really faster than another, so consider the techniques below as possibilities to test on your target architecture.
 
 ## Compute the sign of an integer
+> we want to find the sign of `v` and hold the result in `sign`
+```
+# obvious way
+>>> sign = -(v < 0)
+```
+`CHAR_BIT` is the number of bits per byte (normally 8) but is platform dependent.
+
+```python
+>>> import sys
+>>> CHAR_BIT = sys.int_info.bits_per_digit
+>>> SIZE_INT = sys.int_info.sizeof_digit
+# Given an integer v, returns -1 iff v < 0, else 0
+>>> sign = v >> (SIZE_INT * CHAR_BIT - 1);
+```
+The above evaluates to `sign = v >> 31` for 32-bit integers. This is one operation faster than the obvious way, `sign = -(v < 0)`. This trick works because when signed integers are shifted right, the value of the far left bit is copied to the other bits. The far left bit is 1 when the value is negative and 0 otherwise; all 1 bits gives -1. Unfortunately, this behavior is architecture-specific.
+
+Alternatively, if you prefer the result be either -1 or +1, then use:
+
+```python
+# Given an integer v, returns -1 iff v < 0, else +1
+>>> sign = 1 | (v >> (SIZE_INT * CHAR_BIT - 1))
+```
+On the other hand, if you prefer the result be either -1, 0, or +1, then use:
+
+```
+# -1, 0, or +1
+>>> sign = (v > 0) - (v < 0)
+```
+*Caveat*: On March 7, 2003, Angus Duggan pointed out that the 1989 ANSI C specification leaves the result of signed right-shift implementation-defined, so on some systems this hack might not work. For greater portability, Toby Speight suggested on September 28, 2005 that CHAR_BIT be used here and throughout rather than assuming bytes were 8 bits long. Angus recommended the more portable versions above, involving casting on March 4, 2006. Rohit Garg suggested the version for non-negative integers on September 12, 2009.
+
 ## Detect if two integers have opposite signs
 
 ```python
-def integers_opposite_signs(x, y):
-    """
-    Given two integers x and y returns True iff
-    x and y have opposite signs
-    """
-    return (x ^ y) < 0
+# True iff x and y have opposite signs
+>>> (x ^ y) < 0
 ```
 
 Manfred Weis suggested I add this entry on November 26, 2009.
 
 ## Compute the integer absolute value (abs) without branching
+> We want to find the absolute value of `v` and hold the result in `r`
 
 ```python
-import sys
-CHAR_BIT = sys.int_info.bits_per_digit
-SIZE_INT = sys.int_info.sizeof_digit
-
-def abs_val(x):
-    mask = x >> (SIZE_INT * (CHAR_BIT - 1))
-    return (x + mask) ^ mask
+>>> import sys
+>>> CHAR_BIT = sys.int_info.bits_per_digit
+>>> SIZE_INT = sys.int_info.sizeof_digit
+>>> mask = v >> (SIZE_INT * (CHAR_BIT - 1))
+>>> r = (v + mask) ^ mask
 ```
 
 Patented variation:
 ```python
-import sys
-CHAR_BIT = sys.int_info.bits_per_digit
-
-def abs_val(x):
-    mask = x >> (CHAR_BIT - 1)
-    return (x ^ mask) - mask
+>>> import sys
+>>> CHAR_BIT = sys.int_info.bits_per_digit
+>>> mask = v >> (CHAR_BIT - 1)
+>>> r = (v ^ mask) - mask
 ```
 
 Some CPUs don't have an integer absolute value instruction (or the compiler fails to use them). On machines where branching is expensive, the above expression can be faster than the obvious approach, `r = (v < 0) ? -(unsigned)v : v`, even though the number of operations is the same.
@@ -147,44 +170,51 @@ On March 14, 2004, Keith H. Duggar sent me the patented variation above; it is s
 
 
 ## Compute the minimum (min) or maximum (max) of two integers without branching
+> We want to find the minimum/maximum of `x` and `y` and hold the result in `r`
+
 ```python
-def min(x, y):
-    """
-    Given integers x and y find min of the two
-    """
-    return y ^ ((x ^ y) & -(x < y))
+# min(x, y)
+>>> r = y ^ ((x ^ y) & - (x < y))
 ```
 On some rare machines where branching is very expensive and no condition move instructions exist, the above expression might be faster than the obvious approach, `r = (x < y) ? x : y`, even though it involves two more instructions. (Typically, the obvious approach is best, though.) It works because if `x < y`, then `-(x < y)` will be all ones, so `r = y ^ (x ^ y) & ~0 = y ^ x ^ y = x`. Otherwise, if `x >= y`, then `-(x < y)` will be all zeros, so `r = y ^ ((x ^ y) & 0) = y`. On some machines, evaluating `(x < y)` as 0 or 1 requires a branch instruction, so there may be no advantage.
 
 To find the maximum, use:
 ```python
-def max(x, y):
-    """
-    Given integers x and y find max of the two
-    """
-    return x ^ ((x ^ y) & -(x < y))
+# max(x, y)
+>>> r = x ^ ((x ^ y) & -(x < y))
 ```
+
 **Quick and dirty versions**
 
 If you know that `INT_MIN <= x - y <= INT_MAX`, then you can use the following, which are faster because (x - y) only needs to be evaluated once.
 
-> *Please note that Integers in Python3 are unbounded i.e the maximum integer representable is a fraction of the available memory. The constant `sys.maxsize` can be used to find the word-size; specifically, it's the maximum value integer that can be stored in the word, e.g., `2**63 - 1` on a 64-bit machine*.
+> *Please note that Integers in Python are unbounded i.e the maximum integer representable is a fraction of the available memory. The constant `sys.maxsize` can be used to find the word-size; specifically, it's the maximum value integer that can be stored in the word, e.g., `2**63 - 1` on a 64-bit machine*.
 
 ```python
-import sys
-CHAR_BIT = sys.int_info.bits_per_digit
-SIZE_INT = sys.int_info.sizeof_digit
+>>> import sys
+>>> CHAR_BIT = sys.int_info.bits_per_digit
+>>> SIZE_INT = sys.int_info.sizeof_digit
+# min(x, y)
+>>> r = y + ((x - y) & ((x - y) >> (SIZE_INT * CHAR_BIT - 1)))
 
-def min(x, y):
-    return y + ((x - y) & ((x - y) >> (SIZE_INT * CHAR_BIT - 1)))
-
-def max(x, y):
-    return x - ((x - y) & ((x - y) >> (SIZE_INT * CHAR_BIT - 1)))
+# max(x, y)
+>>> r =  x - ((x - y) & ((x - y) >> (SIZE_INT * CHAR_BIT - 1)))
 ```
 
 Note that the 1989 ANSI C specification doesn't specify the result of signed right-shift, so these aren't portable. If exceptions are thrown on overflows, then the values of x and y should be unsigned or cast to unsigned for the subtractions to avoid unnecessarily throwing an exception, however the right-shift needs a signed operand to produce all one bits when negative, so cast to signed there. On March 7, 2003, Angus Duggan pointed out the right-shift portability issue. On May 3, 2005, Randal E. Bryant alerted me to the need for the precondition, `INT_MIN <= x - y <= INT_MAX`, and suggested the non-quick and dirty version as a fix. Both of these issues concern only the quick and dirty version. Nigel Horspoon observed on July 6, 2005 that gcc produced the same code on a Pentium as the obvious solution because of how it evaluates `(x < y)`. On July 9, 2008 Vincent Lefèvre pointed out the potential for overflow exceptions with subtractions in `r = y + ((x - y) & -(x < y))`, which was the previous version. Timothy B. Terriberry suggested using xor rather than add and subract to avoid casting and the risk of overflows on June 2, 2009.
 
 ## Determining if an integer is a power of 2
+
+> We want to see if `v` is a power of 2, `f` holds the boolean result.
+
+```python
+>>> f = (v & (v - 1)) == 0
+```
+Note that 0 is incorrectly considered a power of 2 here. To remedy this, use:
+
+```python
+>>> f = v and not(v & (v - 1))
+```
 ## Sign extending
 ### Sign extending from a constant bit-width
 ### Sign extending from a variable bit-width
