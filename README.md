@@ -106,7 +106,7 @@ When totaling the number of operations for algorithms here, any Python operator 
 ## Compute the sign of an integer
 > we want to find the sign of `v` and hold the result in `sign`
 ```python
-# obvious way
+# obvious way, -1 if negative, 0 if positive
 >>> sign = -(v < 0)
 ```
 `CHAR_BIT` is the number of bits per byte (normally 8) but is platform dependent.
@@ -144,7 +144,7 @@ On the other hand, if you prefer the result be either -1, 0, or +1, then use:
 Manfred Weis suggested I add this entry on November 26, 2009.
 
 ## Compute the integer absolute value (abs) without branching
-> We want to find the absolute value of `v` and hold the result in `r`
+> we want to find the absolute value of `v` and hold the result in `r`
 
 ```python
 >>> import sys
@@ -170,7 +170,7 @@ On March 14, 2004, Keith H. Duggar sent me the patented variation above; it is s
 
 
 ## Compute the minimum (min) or maximum (max) of two integers without branching
-> We want to find the minimum/maximum of `x` and `y` and hold the result in `r`
+> we want to find the minimum/maximum of `x` and `y` and hold the result in `r`
 
 ```python
 # min(x, y)
@@ -205,7 +205,7 @@ Note that the 1989 ANSI C specification doesn't specify the result of signed rig
 
 ## Determining if an integer is a power of 2
 
-> We want to see if `v` is a power of 2, `f` holds the boolean result.
+> we want to see if `v` is a power of 2, `f` holds the boolean result.
 
 ```python
 >>> f = (v & (v - 1)) == 0
