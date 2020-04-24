@@ -86,7 +86,9 @@
 # Bit Twiddling Hacks
 This project provides code snippets of Sean Anderson's compilation of [bit manipulation tricks](https://graphics.stanford.edu/~seander/bithacks.html) in [Python](https://www.python.org/) to make it easy to follow for those who do not have experience in [C](https://en.wikipedia.org/wiki/C_(programming_language)).
 
-I will not alter the explanations provided by Sean because they provide a lot of context. Where necessary, I will add a *NOTE* section or just comments within the Python code.
+I will not alter the explanations provided by Sean because they provide a lot of context. Where necessary, I will add a *NOTE* section as a quote, see below notation, or just as comments within the Python code.
+
+> *example quote*
 
 # Acknowledgement
 > Hats off to Sean Eron Anderson, seander@cs.stanford.edu, for creating https://graphics.stanford.edu/~seander/bithacks.html
@@ -105,7 +107,7 @@ When totaling the number of operations for algorithms here, any Python operator 
 ## Compute the sign of an integer
 ## Detect if two integers have opposite signs
 
-```
+```python
 def integers_opposite_signs(x, y):
     """
     Given two integers x and y returns True iff
@@ -118,7 +120,7 @@ Manfred Weis suggested I add this entry on November 26, 2009.
 
 ## Compute the integer absolute value (abs) without branching
 
-```
+```python
 import sys
 CHAR_BIT = sys.int_info.bits_per_digit
 SIZE_INT = sys.int_info.sizeof_digit
@@ -128,8 +130,8 @@ def abs_val(x):
     return (x + mask) ^ mask
 ```
 
-Patented variation, superior because a multiply is not used:
-```
+Patented variation:
+```python
 import sys
 CHAR_BIT = sys.int_info.bits_per_digit
 
@@ -146,6 +148,43 @@ On March 14, 2004, Keith H. Duggar sent me the patented variation above; it is s
 
 
 ## Compute the minimum (min) or maximum (max) of two integers without branching
+```python
+def min(x, y):
+    """
+    Given integers x and y find min of the two
+    """
+    return y ^ ((x ^ y) & -(x < y))
+```
+On some rare machines where branching is very expensive and no condition move instructions exist, the above expression might be faster than the obvious approach, `r = (x < y) ? x : y`, even though it involves two more instructions. (Typically, the obvious approach is best, though.) It works because if `x < y`, then `-(x < y)` will be all ones, so `r = y ^ (x ^ y) & ~0 = y ^ x ^ y = x`. Otherwise, if `x >= y`, then `-(x < y)` will be all zeros, so `r = y ^ ((x ^ y) & 0) = y`. On some machines, evaluating `(x < y)` as 0 or 1 requires a branch instruction, so there may be no advantage.
+
+To find the maximum, use:
+```python
+def max(x, y):
+    """
+    Given integers x and y find max of the two
+    """
+    return x ^ ((x ^ y) & -(x < y))
+```
+**Quick and dirty versions**
+
+If you know that `INT_MIN <= x - y <= INT_MAX`, then you can use the following, which are faster because (x - y) only needs to be evaluated once.
+
+> *Please note that Integers in Python3 are unbounded i.e the maximum integer representable is a fraction of the available memory. The constant `sys.maxsize` can be used to find the word-size; specifically, it's the maximum value integer that can be stored in the word, e.g., `2**63 - 1` on a 64-bit machine*.
+
+```python
+import sys
+CHAR_BIT = sys.int_info.bits_per_digit
+SIZE_INT = sys.int_info.sizeof_digit
+
+def min(x, y):
+    return y + ((x - y) & ((x - y) >> (SIZE_INT * CHAR_BIT - 1)))
+
+def max(x, y):
+    return x - ((x - y) & ((x - y) >> (SIZE_INT * CHAR_BIT - 1)))
+```
+
+Note that the 1989 ANSI C specification doesn't specify the result of signed right-shift, so these aren't portable. If exceptions are thrown on overflows, then the values of x and y should be unsigned or cast to unsigned for the subtractions to avoid unnecessarily throwing an exception, however the right-shift needs a signed operand to produce all one bits when negative, so cast to signed there. On March 7, 2003, Angus Duggan pointed out the right-shift portability issue. On May 3, 2005, Randal E. Bryant alerted me to the need for the precondition, `INT_MIN <= x - y <= INT_MAX`, and suggested the non-quick and dirty version as a fix. Both of these issues concern only the quick and dirty version. Nigel Horspoon observed on July 6, 2005 that gcc produced the same code on a Pentium as the obvious solution because of how it evaluates `(x < y)`. On July 9, 2008 Vincent Lefèvre pointed out the potential for overflow exceptions with subtractions in `r = y + ((x - y) & -(x < y))`, which was the previous version. Timothy B. Terriberry suggested using xor rather than add and subract to avoid casting and the risk of overflows on June 2, 2009.
+
 ## Determining if an integer is a power of 2
 ## Sign extending
 ### Sign extending from a constant bit-width
