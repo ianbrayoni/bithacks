@@ -86,6 +86,8 @@
 # Bit Twiddling Hacks
 This project provides code snippets of Sean Anderson's compilation of [bit manipulation tricks](https://graphics.stanford.edu/~seander/bithacks.html) in [Python](https://www.python.org/) to make it easy to follow for those who do not have experience in [C](https://en.wikipedia.org/wiki/C_(programming_language)).
 
+I will not alter the explanations provided by Sean because they provide a lot of context. Where necessary, I will add a *NOTE* section or just comments within the Python code.
+
 # Acknowledgement
 > Hats off to Sean Eron Anderson, seander@cs.stanford.edu, for creating https://graphics.stanford.edu/~seander/bithacks.html
 
@@ -98,9 +100,51 @@ I **DO NOT** own any of this. The following contents comes directly from the abo
 # Contents
 
 ## About the operation counting methodology
+When totaling the number of operations for algorithms here, any Python operator is counted as one operation. Intermediate assignments, which need not be written to RAM, are not counted. Of course, this operation counting approach only serves as an approximation of the actual number of machine instructions and CPU time. All operations are assumed to take the same amount of time, which is not true in reality, but CPUs have been heading increasingly in this direction over time. There are many nuances that determine how fast a system will run a given sample of code, such as cache sizes, memory bandwidths, instruction sets, etc. In the end, benchmarking is the best way to determine whether one method is really faster than another, so consider the techniques below as possibilities to test on your target architecture.
+
 ## Compute the sign of an integer
 ## Detect if two integers have opposite signs
+
+```
+def integers_opposite_signs(x, y):
+    """
+    Given two integers x and y returns True iff
+    x and y have opposite signs
+    """
+    return (x ^ y) < 0
+```
+
+Manfred Weis suggested I add this entry on November 26, 2009.
+
 ## Compute the integer absolute value (abs) without branching
+
+```
+import sys
+CHAR_BIT = sys.int_info.bits_per_digit
+SIZE_INT = sys.int_info.sizeof_digit
+
+def abs_val(x):
+    mask = x >> (SIZE_INT * (CHAR_BIT - 1))
+    return (x + mask) ^ mask
+```
+
+Patented variation, superior because a multiply is not used:
+```
+import sys
+CHAR_BIT = sys.int_info.bits_per_digit
+
+def abs_val(x):
+    mask = x >> (CHAR_BIT - 1)
+    return (x ^ mask) - mask
+```
+
+Some CPUs don't have an integer absolute value instruction (or the compiler fails to use them). On machines where branching is expensive, the above expression can be faster than the obvious approach, `r = (v < 0) ? -(unsigned)v : v`, even though the number of operations is the same.
+
+On March 7, 2003, Angus Duggan pointed out that the 1989 ANSI C specification leaves the result of signed right-shift implementation-defined, so on some systems this hack might not work. I've read that ANSI C does not require values to be represented as two's complement, so it may not work for that reason as well (on a diminishingly small number of old machines that still use one's complement).
+
+On March 14, 2004, Keith H. Duggar sent me the patented variation above; it is superior to the one I initially came up with, `r=(+1|(v>>(sizeof(int)*CHAR_BIT-1)))*v`, because a multiply is not used. Unfortunately, this method has been patented in the USA on June 6, 2000 by Vladimir Yu Volkonsky and assigned to Sun Microsystems. On August 13, 2006, Yuriy Kaminskiy told me that the patent is likely invalid because the method was published well before the patent was even filed, such as in How to Optimize for the Pentium Processor by Agner Fog, dated November, 9, 1996. Yuriy also mentioned that this document was translated to Russian in 1997, which Vladimir could have read. Moreover, the Internet Archive also has an old link to it. On January 30, 2007, Peter Kankowski shared with me an abs version he discovered that was inspired by Microsoft's Visual C++ compiler output. It is featured here as the primary solution. On December 6, 2007, Hai Jin complained that the result was signed, so when computing the abs of the most negative value, it was still negative. On April 15, 2008 Andrew Shapira pointed out that the obvious approach could overflow, as it lacked an (unsigned) cast then; for maximum portability he suggested `(v < 0) ? (1 + ((unsigned)(-1-v))) : (unsigned)v`. But citing the ISO C99 spec on July 9, 2008, Vincent Lefèvre convinced me to remove it becasue even on non-2s-complement machines -(unsigned)v will do the right thing. The evaluation of -(unsigned)v first converts the negative value of v to an unsigned by adding `2**N`, yielding a 2s complement representation of v's value that I'll call U. Then, U is negated, giving the desired result, `-U = 0 - U = 2**N - U = 2**N - (v+2**N) = -v = abs(v)`.
+
+
 ## Compute the minimum (min) or maximum (max) of two integers without branching
 ## Determining if an integer is a power of 2
 ## Sign extending
