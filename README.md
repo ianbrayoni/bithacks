@@ -105,7 +105,7 @@ When totaling the number of operations for algorithms here, any Python operator 
 
 ## Compute the sign of an integer
 > we want to find the sign of `v` and hold the result in `sign`
-```
+```python
 # obvious way
 >>> sign = -(v < 0)
 ```
@@ -128,7 +128,7 @@ Alternatively, if you prefer the result be either -1 or +1, then use:
 ```
 On the other hand, if you prefer the result be either -1, 0, or +1, then use:
 
-```
+```python
 # -1, 0, or +1
 >>> sign = (v > 0) - (v < 0)
 ```
