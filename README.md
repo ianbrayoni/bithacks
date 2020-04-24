@@ -171,7 +171,7 @@ I **DO NOT** own any of this. The following contents comes directly from the abo
 ### Determine if a word has a byte between m and n
 ### Compute the lexicographically next bit permutation
 
-# Contributions
+# Contributing
 Please take a minute to go over [Contributions Guidelines](CONTRIBUTING.md)
 
 Contributions are welcome!
