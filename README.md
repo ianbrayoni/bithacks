@@ -1,8 +1,13 @@
+# Bit Twiddling Hacks
+This project provides code snippets of Sean Anderson's compilation of [bit manipulation tricks](https://graphics.stanford.edu/~seander/bithacks.html) in [Python](https://www.python.org/) to make it easy to follow for those who do not have experience in [C](https://en.wikipedia.org/wiki/C_(programming_language)). I will not alter the explanations provided by Sean because they provide a lot of context. Where necessary, I will add a *NOTE* section as a quote, see below notation, or just as comments within the Python code.
+
+> *example quote*
+
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Bit Twiddling Hacks](#bit-twiddling-hacks)
 - [Acknowledgement](#acknowledgement)
 - [License](#license)
 - [Contents](#contents)
@@ -82,13 +87,6 @@
 - [Contributing](#contributing)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-# Bit Twiddling Hacks
-This project provides code snippets of Sean Anderson's compilation of [bit manipulation tricks](https://graphics.stanford.edu/~seander/bithacks.html) in [Python](https://www.python.org/) to make it easy to follow for those who do not have experience in [C](https://en.wikipedia.org/wiki/C_(programming_language)).
-
-I will not alter the explanations provided by Sean because they provide a lot of context. Where necessary, I will add a *NOTE* section as a quote, see below notation, or just as comments within the Python code.
-
-> *example quote*
 
 # Acknowledgement
 > Hats off to Sean Eron Anderson, seander@cs.stanford.edu, for creating https://graphics.stanford.edu/~seander/bithacks.html
