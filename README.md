@@ -235,7 +235,25 @@ Note that 0 is incorrectly considered a power of 2 here. To remedy this, use:
 ### Compute parity by lookup table
 ### Compute parity of a byte using 64-bit multiply and modulus division
 ### Compute parity of word with a multiply
+
 ### Compute parity in parallel
+
+```python
+>>> v ^= v >> 16
+>>> v ^= v >> 8
+>>> v ^= v >> 4
+>>> v &= 0xf
+>>> even_parity = (0x6996 >> v) & 1
+```
+
+The method above takes around 9 operations, and works for 32-bit words. It may be optimized to work just on bytes in 5 operations by removing the first two lines.
+
+The method first shifts and XORs the eight nibbles of the 32-bit value together, leaving the result in the lowest nibble of v. Next, the binary number `0110 1001 1001 0110` (`0x6996` in hex) is shifted to the right by the value represented in the lowest nibble of v. This number is like a miniature 16-bit parity-table indexed by the low four bits in v. The result has the parity of `v` in bit 1, which is masked and returned.
+
+Thanks to Mathew Hendry for pointing out the shift-lookup idea at the end on Dec. 15, 2002. That optimization shaves two operations off using only shifting and XORing to find the parity.
+
+> If you want "odd parity", you can change the last line to `odd_parity = 1 - (0x6996 >> v) & 1`
+
 ## Swapping Values
 ### Swapping values with subtraction and addition
 ### Swapping values with XOR
